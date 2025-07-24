@@ -153,7 +153,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
 
   # Stock Management endpoints
-  /service/stock/get:
+  /service/stock/daily:
     get:
       tags:
         - Stock Management
@@ -176,7 +176,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  /service/stock/get/{date}:
+  /service/stock/daily/{date}:
     get:
       tags:
         - Stock Management
@@ -203,6 +203,52 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/DailyStock'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /service/stock/weekly:
+    get:
+      tags:
+        - Stock Management
+      summary: Get past week stock data
+      description: Retrieves stock data for the past 7 days
+      responses:
+        '200':
+          description: Weekly stock data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/WeeklyStock'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /service/stock/monthly:
+    get:
+      tags:
+        - Stock Management
+      summary: Get past month stock data
+      description: Retrieves stock data for the past 30 days
+      responses:
+        '200':
+          description: Monthly stock data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MonthlyStock'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -252,7 +298,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
 
   # Sales Management endpoints
-  /service/sales/get:
+  /service/sales/daily:
     get:
       tags:
         - Sales Management
@@ -275,7 +321,7 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  /service/sales/get/{date}:
+  /service/sales/daily/{date}:
     get:
       tags:
         - Sales Management
@@ -302,6 +348,52 @@ paths:
                     properties:
                       data:
                         $ref: '#/components/schemas/DailySales'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /service/sales/weekly:
+    get:
+      tags:
+        - Sales Management
+      summary: Get past week sales data
+      description: Retrieves sales data for the past 7 days
+      responses:
+        '200':
+          description: Weekly sales data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/WeeklySales'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /service/sales/monthly:
+    get:
+      tags:
+        - Sales Management
+      summary: Get past month sales data
+      description: Retrieves sales data for the past 30 days
+      responses:
+        '200':
+          description: Monthly sales data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/MonthlySales'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -460,6 +552,46 @@ components:
         - token
         - expireTime
         - uses
+
+    WeeklyStock:
+      type: object
+      properties:
+        weeklyStock:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyStock'
+      required:
+        - weeklyStock
+
+    MonthlyStock:
+      type: object
+      properties:
+        monthlyStock:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailyStock'
+      required:
+        - monthlyStock
+
+    WeeklySales:
+      type: object
+      properties:
+        weeklySales:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailySales'
+      required:
+        - weeklySales
+
+    MonthlySales:
+      type: object
+      properties:
+        monthlySales:
+          type: array
+          items:
+            $ref: '#/components/schemas/DailySales'
+      required:
+        - monthlySales
 
   responses:
     BadRequest:

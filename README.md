@@ -136,13 +136,17 @@ The API server will be available at: `http://localhost:8080`
 - `GET /service/gemini/token` - Get ephemeral Gemini AI token
 
 #### 📦 Stock Management
-- `GET /service/stock/get` - Get today's stock
-- `GET /service/stock/get/{date}` - Get stock for specific date
+- `GET /service/stock/daily` - Get today's stock
+- `GET /service/stock/daily/{date}` - Get stock for specific date
+- `GET /service/stock/weekly` - Get past week stock data
+- `GET /service/stock/monthly` - Get past month stock data
 - `PUT /service/stock/add` - Add new stock items
 
 #### 💰 Sales Management
-- `GET /service/sales/get` - Get today's sales
-- `GET /service/sales/get/{date}` - Get sales for specific date
+- `GET /service/sales/daily` - Get today's sales
+- `GET /service/sales/daily/{date}` - Get sales for specific date
+- `GET /service/sales/weekly` - Get past week sales data
+- `GET /service/sales/monthly` - Get past month sales data
 - `PUT /service/sales/add` - Record sales transactions
 
 ### Interactive API Documentation
