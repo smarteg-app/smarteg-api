@@ -1,0 +1,505 @@
+openapi: 3.0.0
+info:
+  title: Smarteg Core API
+  description: API backend for Smarteg, a Next.js-based PWA designed to help Warteg (small Indonesian food stalls) minimize food waste, optimize stock management, and empower UMKM (Usaha Mikro, Kecil, dan Menengah) in sustainable practices. The MVP requires constant online connectivity, leveraging the browser’s Web Speech API for Speech-to-Text (STT) and Text-to-Speech (TTS). Predictive analytics for supply forecasting are processed locally in the frontend using a JavaScript algorithm (e.g., weighted moving averages). A WebSocket connection to a temporary server hosting Google Gemini AI enables real-time background processing for discrepancy detection and stock validation.
+  version: 1.0.0
+  contact:
+    email: contact@smarteg.app
+servers:
+  - url: https://api.smarteg.app
+    description: Production Server
+  - url: http://localhost:8080
+    description: Local Development Server
+
+security:
+  - BearerAuth: []
+
+paths:
+  # Root endpoint
+  /:
+    get:
+      summary: Get API homepage
+      description: Returns the homepage HTML
+      security: []
+      responses:
+        '200':
+          description: Homepage HTML
+          content:
+            text/html:
+              schema:
+                type: string
+
+  # User Authentication endpoints
+  /user/auth/sign-token:
+    get:
+      tags:
+        - Authentication
+      summary: Sign JWT token after OAuth
+      description: Creates and returns a JWT token after successful OAuth authentication
+      security: []
+      responses:
+        '302':
+          description: Redirect to frontend with token
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /user/auth/refresh-token:
+    get:
+      tags:
+        - Authentication
+      summary: Refresh JWT token
+      description: Refreshes an existing JWT token
+      responses:
+        '200':
+          description: Token refreshed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          email:
+                            type: string
+                            format: email
+                          token:
+                            type: string
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /user/auth/google:
+    get:
+      tags:
+        - Authentication
+      summary: Start Google OAuth authentication
+      description: Initiates Google OAuth 2.0 authentication flow
+      security: []
+      responses:
+        '302':
+          description: Redirect to Google OAuth
+
+  /user/auth/google/callback:
+    get:
+      tags:
+        - Authentication
+      summary: Google OAuth callback
+      description: Handles callback from Google OAuth
+      security: []
+      parameters:
+        - name: code
+          in: query
+          description: Authorization code from Google
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to sign-token endpoint on success or failure endpoint
+
+  /user/auth/google/logout:
+    get:
+      tags:
+        - Authentication
+      summary: Logout user
+      description: Logs out user and destroys session
+      security: []
+      responses:
+        '302':
+          description: Redirect to frontend
+
+  /user/auth/google/failure:
+    get:
+      tags:
+        - Authentication
+      summary: OAuth failure handler
+      description: Handles OAuth authentication failures
+      security: []
+      responses:
+        '400':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  # Gemini Service endpoints
+  /service/gemini/token:
+    get:
+      tags:
+        - Gemini Service
+      summary: Get Gemini ephemeral token
+      description: Generates an ephemeral token for Google Gemini AI service
+      responses:
+        '200':
+          description: Gemini token generated successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/GeminiToken'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # Stock Management endpoints
+  /service/stock/get:
+    get:
+      tags:
+        - Stock Management
+      summary: Get today's stock
+      description: Retrieves stock data for the current date
+      responses:
+        '200':
+          description: Stock data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DailyStock'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /service/stock/get/{date}:
+    get:
+      tags:
+        - Stock Management
+      summary: Get stock for specific date
+      description: Retrieves stock data for a specific date
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: Date in YYYY-MM-DD format
+          schema:
+            type: string
+            format: date
+            example: "2025-01-24"
+      responses:
+        '200':
+          description: Stock data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DailyStock'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /service/stock/add:
+    put:
+      tags:
+        - Stock Management
+      summary: Add new stock items
+      description: Adds new stock items to today's inventory
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/StockItem'
+            example:
+              - name: "Ayam Goreng Serundeng"
+                price: 10000
+                counts: 17
+              - name: "Ayam Bakar"
+                price: 10000
+                counts: 12
+      responses:
+        '200':
+          description: Stock added successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          newstock:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/StockItem'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # Sales Management endpoints
+  /service/sales/get:
+    get:
+      tags:
+        - Sales Management
+      summary: Get today's sales
+      description: Retrieves sales data for the current date
+      responses:
+        '200':
+          description: Sales data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DailySales'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /service/sales/get/{date}:
+    get:
+      tags:
+        - Sales Management
+      summary: Get sales for specific date
+      description: Retrieves sales data for a specific date
+      parameters:
+        - name: date
+          in: path
+          required: true
+          description: Date in YYYY-MM-DD format
+          schema:
+            type: string
+            format: date
+            example: "2025-01-24"
+      responses:
+        '200':
+          description: Sales data retrieved successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/DailySales'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /service/sales/add:
+    put:
+      tags:
+        - Sales Management
+      summary: Record sales (sell stock items)
+      description: Records sales by reducing stock counts and updating sales totals
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/SaleRequest'
+            example:
+              - name: "Ayam Goreng Serundeng"
+                counts: 17
+              - name: "Ayam Bakar"
+                counts: 12
+      responses:
+        '200':
+          description: Sales recorded successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          sales:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/SaleRequest'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ApiResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [success, error]
+          example: success
+        message:
+          type: string
+          example: "Operation completed successfully"
+        data:
+          type: object
+      required:
+        - status
+        - message
+        - data
+
+    StockItem:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the stock item
+          example: "Ayam Goreng Serundeng"
+        price:
+          type: number
+          description: Price per item in IDR
+          example: 10000
+        counts:
+          type: integer
+          description: Number of items in stock
+          minimum: 0
+          example: 17
+      required:
+        - name
+        - price
+        - counts
+
+    DailyStock:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/StockItem'
+        date:
+          type: string
+          format: date
+          description: Date in YYYY-MM-DD format
+          example: "2025-01-24"
+      required:
+        - items
+        - date
+
+    SaleRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the item to sell
+          example: "Ayam Goreng Serundeng"
+        counts:
+          type: integer
+          description: Number of items to sell
+          minimum: 1
+          example: 5
+      required:
+        - name
+        - counts
+
+    DailySales:
+      type: object
+      properties:
+        sales:
+          type: number
+          description: Total sales amount in IDR
+          example: 150000
+        date:
+          type: string
+          format: date
+          description: Date in YYYY-MM-DD format
+          example: "2025-01-24"
+      required:
+        - sales
+        - date
+
+    GeminiToken:
+      type: object
+      properties:
+        token:
+          type: string
+          description: Ephemeral token for Gemini AI service
+        expireTime:
+          type: string
+          format: date-time
+          description: Token expiration time
+        uses:
+          type: integer
+          description: Number of allowed uses
+          example: 1
+      required:
+        - token
+        - expireTime
+        - uses
+
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  status:
+                    example: error
+                  message:
+                    example: "Bad Request"
+                  data:
+                    example: {}
+
+    UnauthorizedError:
+      description: Authentication required
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: '#/components/schemas/ApiResponse'
+              - type: object
+                properties:
+                  status:
+                    example: error
+                  message:
+                    example: "Unauthorized: Authentication required"
+                  data:
+                    example: {}
+
+tags:
+  - name: Authentication
+    description: User authentication and authorization endpoints
+  - name: Gemini Service
+    description: Google Gemini AI service integration
+  - name: Stock Management
+    description: Inventory and stock management endpoints
+  - name: Sales Management
+    description: Sales tracking and transaction endpoints
