@@ -24,6 +24,7 @@ This repository contains the **API backend server** that powers the Smarteg ecos
 - 🍽️ **Menu Management System** with full CRUD operations for menu items
 - 📦 **Stock Management System** with real-time inventory tracking
 - 💰 **Sales Management** with daily transaction recording
+- 📢 **Automated Announcement System** via Telegram channel for freshly made food alerts
 - 🗄️ **MongoDB Database Storage** for persistent data management
 
 ## 🏗️ Architecture Overview
@@ -35,6 +36,7 @@ The MVP architecture leverages:
 - **Local Predictive Analytics** (frontend) using JavaScript algorithms (weighted moving averages)
 - **WebSocket Connection** to this backend server hosting Google Gemini AI for real-time background processing
 - **Discrepancy Detection & Stock Validation** powered by AI
+- **Automated Customer Communication** via Telegram Bot API for freshly made food announcements
 
 ## 🛠️ Tech Stack
 
@@ -46,6 +48,8 @@ The MVP architecture leverages:
   - Google OAuth 2.0 (Passport.js)
   - JWT (JSON Web Tokens)
 - **AI Integration**: Google Gemini AI (@google/genai)
+- **Communication**: Telegram Bot API for automated announcements
+- **File Upload**: Multer for multipart/form-data handling
 - **Session Management**: Express Session
 - **Security**: CORS, Body Parser
 
@@ -96,6 +100,9 @@ GOOGLE_CLIENT_ID=your-google-client-id
 GOOGLE_CLIENT_SECRET=your-google-client-secret
 GOOGLE_OAUTH_CALLBACK=http://localhost:8080/user/auth/google/callback
 GOOGLE_AI_API_KEY=your-google-ai-api-key
+
+TELEGRAM_BOT_TOKEN=your-telegram-bot-token
+TELEGRAM_CHAT_ID=@your_channel_username
 ```
 
 ### 3. Start Database Services
@@ -160,6 +167,9 @@ The API server will be available at: `http://localhost:8080`
 - `GET /service/sales/weekly` - Get past week sales data
 - `GET /service/sales/monthly` - Get past month sales data
 - `PUT /service/sales/add` - Record sales transactions
+
+#### 📢 Announcement Service
+- `POST /service/post/telegram-channel` - Send photo with announcement to Telegram channel (automated food freshness alerts)
 
 ### Interactive API Documentation
 
@@ -238,6 +248,27 @@ MONGODB_URI=mongodb://your-production-mongodb-uri
 {
   "name": "Ayam Goreng Serundeng",
   "counts": 5
+}
+```
+
+### Telegram Announcement Request
+```
+Content-Type: multipart/form-data
+
+photo: [image file] (required, max 10MB)
+caption: "🍗 Ayam Goreng Serundeng freshly taken out of fryer, ready to serve!"
+```
+
+### Telegram Response
+```json
+{
+  "status": "success",
+  "message": "Photo sent to Telegram channel successfully",
+  "data": {
+    "message_id": 123456,
+    "chat_id": -1001234567890,
+    "date": 1735043924
+  }
 }
 ```
 

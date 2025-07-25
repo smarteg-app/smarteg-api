@@ -626,6 +626,65 @@ paths:
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
+  # Announcement Service endpoints
+  /service/post/telegram-channel:
+    post:
+      tags:
+        - Announcement Service
+      summary: Send food announcement to Telegram channel
+      description: Automated tool for food stalls to record and announce freshly made food availability to customers via Telegram channel (e.g., "Fried Chicken freshly taken out of fryer, ready to serve!")
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+                  description: Photo of the freshly made food (required, max 10MB, images only)
+                caption:
+                  type: string
+                  description: Optional caption/announcement text for the food item
+                  example: "🍗 Ayam Goreng Serundeng freshly taken out of fryer, ready to serve! Hot and crispy, available now!"
+              required:
+                - photo
+            encoding:
+              photo:
+                contentType: image/*
+      responses:
+        '200':
+          description: Photo sent to Telegram channel successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/TelegramResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '500':
+          description: Server configuration error
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      status:
+                        example: error
+                      message:
+                        example: "TELEGRAM_BOT_TOKEN environment variable is not configured"
+                      data:
+                        example: {}
+
 components:
   securitySchemes:
     BearerAuth:
@@ -832,6 +891,26 @@ components:
         - email
         - picture
 
+    TelegramResponse:
+      type: object
+      properties:
+        message_id:
+          type: integer
+          description: Telegram message ID of the sent photo
+          example: 123456
+        chat_id:
+          type: integer
+          description: Telegram chat ID where the photo was sent
+          example: -1001234567890
+        date:
+          type: integer
+          description: Unix timestamp when the message was sent
+          example: 1735043924
+      required:
+        - message_id
+        - chat_id
+        - date
+
   responses:
     BadRequest:
       description: Bad request
@@ -878,3 +957,5 @@ tags:
     description: Inventory and stock management endpoints
   - name: Sales Management
     description: Sales tracking and transaction endpoints
+  - name: Announcement Service
+    description: Automated food stall announcements and customer communication via Telegram channel
