@@ -9,6 +9,8 @@ const serviceSchema = new mongoose.Schema({
     email: { type: String, required: true },
     menu: [{
         name: { type: String, unique: true, required: true },
+        icon: { type: String, required: true },
+        capital: { type: Number, required: true },
         price: { type: Number, required: true },
     }],
     newstock: [{

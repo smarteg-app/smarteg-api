@@ -134,6 +134,10 @@ The API server will be available at: `http://localhost:8080`
 - `GET /user/auth/refresh-token` - Refresh JWT token
 - `GET /user/auth/google/logout` - Logout user
 
+#### 👤 User Profile
+- `GET /user/me` - Get authenticated user profile
+- `PUT /user/me` - Update user profile
+
 #### 🤖 Gemini AI Service
 - `GET /service/gemini/token` - Get ephemeral Gemini AI token
 
@@ -184,10 +188,21 @@ MONGODB_URI=mongodb://your-production-mongodb-uri
 
 ## 📊 Data Models
 
+### User Profile
+```json
+{
+  "name": "Faiz",
+  "email": "m@faiz.at",
+  "picture": "https://lh3.googleusercontent.com/a/example"
+}
+```
+
 ### Menu Item
 ```json
 {
   "name": "Ayam Bakar",
+  "icon": "🍗",
+  "capital": 5000,
   "price": 10000
 }
 ```
