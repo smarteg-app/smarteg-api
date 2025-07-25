@@ -17,9 +17,7 @@ const Strategy = new GoogleStrategy({
                 picture: profile.picture
             });
             await newUser.save();
-        }
-        const getService = await Service.findOne({ email: profile.email });
-        if (!getService) {
+            
             const newService = new Service({
                 email: profile.email
             });

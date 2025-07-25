@@ -174,15 +174,24 @@ const add = async (req, res) => {
 
             for (const ns of newstock) {
                 let item = datedstockdata.items.find(i => i.name === ns.name);
-            
+                
                 if (item) {
                     item.counts += ns.counts;
                 } else {
-                    datedstockdata.items.push({
-                        name: ns.name,
-                        price: ns.price,
-                        counts: ns.counts
-                    });
+                    let checkmenu = getService.menu.find(menu => menu.name == ns.name);
+                    if (checkmenu) {
+                        datedstockdata.items.push({
+                            name: ns.name,
+                            price: ns.price,
+                            counts: ns.counts
+                        });
+                    } else {
+                        return res.status(400).json({
+                            status: 'error',
+                            message: `Item ${ns.name} not found in user's menu`,
+                            data: {}
+                        });
+                    }
                 }
             
                 getService.newstock.push({

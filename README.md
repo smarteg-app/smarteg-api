@@ -21,6 +21,7 @@ This repository contains the **API backend server** that powers the Smarteg ecos
 
 - 🔐 **Google OAuth Authentication** with JWT token management
 - 🤖 **Google Gemini AI Integration** for ephemeral token generation
+- 🍽️ **Menu Management System** with full CRUD operations for menu items
 - 📦 **Stock Management System** with real-time inventory tracking
 - 💰 **Sales Management** with daily transaction recording
 - 🗄️ **MongoDB Database Storage** for persistent data management
@@ -128,12 +129,19 @@ The API server will be available at: `http://localhost:8080`
 #### 🔐 Authentication
 - `GET /user/auth/google` - Initiate Google OAuth
 - `GET /user/auth/google/callback` - OAuth callback handler
+- `GET /user/auth/google/failure` - OAuth failure handler
 - `GET /user/auth/sign-token` - Generate JWT after OAuth
 - `GET /user/auth/refresh-token` - Refresh JWT token
 - `GET /user/auth/google/logout` - Logout user
 
 #### 🤖 Gemini AI Service
 - `GET /service/gemini/token` - Get ephemeral Gemini AI token
+
+#### 🍽️ Menu Management
+- `GET /service/menu/read` - Get user menu items
+- `POST /service/menu/create` - Create new menu items
+- `PUT /service/menu/update` - Update existing menu items
+- `DELETE /service/menu/remove` - Remove menu item
 
 #### 📦 Stock Management
 - `GET /service/stock/daily` - Get today's stock
@@ -176,6 +184,14 @@ MONGODB_URI=mongodb://your-production-mongodb-uri
 
 ## 📊 Data Models
 
+### Menu Item
+```json
+{
+  "name": "Ayam Bakar",
+  "price": 10000
+}
+```
+
 ### Stock Item
 ```json
 {
@@ -197,7 +213,16 @@ MONGODB_URI=mongodb://your-production-mongodb-uri
 ```json
 {
   "sales": 150000,
+  "items": [/* Array of sold items */],
   "date": "2025-01-24"
+}
+```
+
+### Sale Request
+```json
+{
+  "name": "Ayam Goreng Serundeng",
+  "counts": 5
 }
 ```
 
@@ -210,7 +235,7 @@ smarteg-api/
 ├── app/
 │   ├── configs/database/     # Database configurations
 │   ├── domains/             # Business logic domains
-│   │   ├── services/        # Core services (stock, sales, gemini)
+│   │   ├── services/        # Core services (menu, stock, sales, gemini)
 │   │   └── users/          # User management & auth
 │   ├── middlewares/         # Custom middlewares
 │   ├── utils/              # Utility functions

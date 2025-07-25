@@ -29,6 +29,7 @@ const daily = async (req, res) => {
         if (!datedsalesdata) {
             const salesplaceholder = {
                 sales: 0,
+                items: [],
                 date: date
             }
             return res.status(200).json({
@@ -39,6 +40,7 @@ const daily = async (req, res) => {
         } else {
             datedsalesdata = datedsalesdata.toObject();
             delete datedsalesdata._id;
+            datedsalesdata.items = datedsalesdata.items.map(({_id, ...keys}) => keys);
             return res.status(200).json({
                 status: 'success',
                 message: 'Successfully read daily sales data for ' + date,
@@ -75,12 +77,14 @@ const weekly = async (req, res) => {
             if (!datedsalesdata) {
                 const salesplaceholder = {
                     sales: 0,
+                    items: [],
                     date: selecteddate
                 }
                 response.push(salesplaceholder);
             } else {
                 datedsalesdata = datedsalesdata.toObject();
                 delete datedsalesdata._id;
+                datedsalesdata.items = datedsalesdata.items.map(({_id, ...keys}) => keys);
                 response.push(datedsalesdata);
             }
         }
@@ -122,12 +126,14 @@ const monthly = async (req, res) => {
             if (!datedsalesdata) {
                 const salesplaceholder = {
                     sales: 0,
+                    items: [],
                     date: selecteddate
                 }
                 response.push(salesplaceholder);
             } else {
                 datedsalesdata = datedsalesdata.toObject();
                 delete datedsalesdata._id;
+                datedsalesdata.items = datedsalesdata.items.map(({_id, ...keys}) => keys);
                 response.push(datedsalesdata);
             }
         }
@@ -176,23 +182,38 @@ const add = async (req, res) => {
                 });
             }
 
-            let dailysalesdata = getService.dailysales.find(ds => ds.date === date);
-
             for (const s of sales) {
+                let dailysalesdata = getService.dailysales.find(ds => ds.date === date);
                 let item = datedstockdata.items.find(i => i.name === s.name);
-            
                 if (item) {
+                    let price = getService.menu.find(menu => menu.name == s.name).price;
                     if (item.counts >= s.counts) {
                         if (!dailysalesdata) {
-                            const salesplaceholder = {
-                                sales: 0,
+                            getService.dailysales.push({
+                                sales: s.counts * price,
+                                items: [{
+                                    name: s.name,
+                                    counts: s.counts
+                                }],
                                 date: date
+                            });
+                        } else {
+                            item.counts -= s.counts;
+                            dailysalesdata.sales += price * s.counts;
+                            let inserted = false;
+                            for (let dsitem of dailysalesdata.items) {
+                                if (dsitem.name === s.name) {
+                                    dsitem.counts += s.counts;
+                                    inserted = true;
+                                }
                             }
-                            getService.dailysales.push(salesplaceholder);
-                            dailysalesdata = getService.dailysales.find(ds => ds.date === date);
+                            if (!inserted) {
+                                dailysalesdata.items.push({
+                                    name: s.name,
+                                    counts: s.counts
+                                })
+                            }
                         }
-                        item.counts -= s.counts;
-                        dailysalesdata.sales += item.price * s.counts;
                     } else {
                         return res.status(400).json({
                             status: 'error',
@@ -203,7 +224,7 @@ const add = async (req, res) => {
                 } else {
                     return res.status(400).json({
                         status: 'error',
-                        message: `Item "${s.name}" not found`,
+                        message: `Item "${s.name}" not found in stock`,
                         data: {}
                     });
                 }
