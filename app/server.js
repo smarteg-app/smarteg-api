@@ -17,8 +17,8 @@ app.use(cors({
         'http://localhost:8080',
         'http://localhost:4173',
         'http://localhost:5173',
-        'https://smarteg.app',
-        'https://api.smarteg.app'
+        'https://smarteg.faizath.com',
+        'https://smarteg-api.faizath.com'
     ],
     credentials: true
 }));

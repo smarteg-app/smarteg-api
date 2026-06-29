@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "API backend for Smarteg",
   "license": "MIT",
-  "author": "Smarteg Developers <dev@smarteg.app>",
+  "author": "Smarteg Developers <dev@smarteg.faizath.com>",
   "type": "commonjs",
   "main": "app/index.js",
   "scripts": {
