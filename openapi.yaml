@@ -4,9 +4,9 @@ info:
   description: API backend for Smarteg, a Next.js-based PWA designed to help Warteg (small Indonesian food stalls) minimize food waste, optimize stock management, and empower UMKM (Usaha Mikro, Kecil, dan Menengah) in sustainable practices. The MVP requires constant online connectivity, leveraging the browser’s Web Speech API for Speech-to-Text (STT) and Text-to-Speech (TTS). Predictive analytics for supply forecasting are processed locally in the frontend using a JavaScript algorithm (e.g., weighted moving averages). A WebSocket connection to a temporary server hosting Google Gemini AI enables real-time background processing for discrepancy detection and stock validation.
   version: 1.0.0
   contact:
-    email: contact@smarteg.app
+    email: contact@smarteg.faizath.com
 servers:
-  - url: https://api.smarteg.app
+  - url: https://smarteg-api.faizath.com
     description: Production Server
   - url: http://localhost:8080
     description: Local Development Server

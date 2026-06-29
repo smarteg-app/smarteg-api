@@ -1,3 +1,20 @@
+<div align="center">
+  <table border="1">
+    <tr>
+      <td align="center" style="padding: 20px;">
+        <h3>📢 Domain & Email Migration Notice</h3>
+        <p>From <b>July 24th, 2026</b>, Smarteg will transition to new domains as <code>smarteg.app</code> will not be renewed:</p>
+        <p>🌐 <b>Website:</b> <a href="https://smarteg.faizath.com">smarteg.faizath.com</a> (formerly <i>smarteg.app</i>)<br>
+        ⚙️ <b>API:</b> <a href="https://smarteg-api.faizath.com">smarteg-api.faizath.com</a> (formerly <i>api.smarteg.app</i>)<br>
+        📧 <b>Email:</b> <a href="mailto:contact@smarteg.faizath.com">contact@smarteg.faizath.com</a> (formerly <i>contact@smarteg.app</i>)<br>
+        🛰️ <b>CDN:</b> <a>smarteg-cdn.faizath.com</a> (formerly <i>cdn.smarteg.app</i>)<br>
+        📈 <b>Status Pages:</b> <a href="https://status.faizath.com/status/smarteg">https://status.faizath.com/status/smarteg</a> (formerly <i>status.smarteg.app</i>)
+        </p>
+      </td>
+    </tr>
+  </table>
+</div>
+
 # 🍽️ Smarteg API Backend
 
 <div align="center">
@@ -15,7 +32,11 @@
 
 ## 🌟 About Smarteg
 
-**Smarteg** is a Next.js-based Progressive Web App (PWA) designed to help **Warteg** (small Indonesian food stalls) minimize food waste, optimize stock management, and empower **UMKM** (Usaha Mikro, Kecil, dan Menengah) in sustainable practices.
+**Smarteg** is a comprehensive **Progressive Web Application (PWA)** specifically designed to revolutionize how **Warteg** (traditional Indonesian food stalls) and **UMKM** (Usaha Mikro, Kecil, dan Menengah) manage their daily operations.
+
+Built as a submission for **[Garuda Hacks 6.0](https://gh6.devpost.com/)** — Indonesia's largest hackathon — Smarteg combines **Google Gemini 2.0 Flash Live AI** with a **voice-first interface** to help small food businesses minimize waste, optimize inventory, and maximize profits through data-driven insights.
+
+> 🏆 View our Devpost submission: [smarteg-voice-ai-for-zero-waste-eateries](https://devpost.com/software/smarteg-voice-ai-for-zero-waste-eateries)
 
 This repository contains the **API backend server** that powers the Smarteg ecosystem by providing:
 
@@ -88,7 +109,7 @@ vi .env
 ```env
 DEBUG=true
 PORT=8080
-FE_HOST=https://smarteg.app
+FE_HOST=https://smarteg.faizath.com
 
 MONGODB_URI="mongodb://admin:password@localhost:27017/smarteg?authSource=admin"
 
@@ -191,7 +212,7 @@ docker compose up --build
 ```env
 DEBUG=false
 PORT=8080
-FE_HOST=https://smarteg.app
+FE_HOST=https://smarteg.faizath.com
 MONGODB_URI=mongodb://your-production-mongodb-uri
 # ... other production configs
 ```
@@ -305,12 +326,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Team
 
-**Smarteg Developers** - [dev@smarteg.app](mailto:dev@smarteg.app)
+**Smarteg Developers** - [dev@smarteg.faizath.com](mailto:dev@smarteg.faizath.com)
 
 <div align="center">
 
 **Made with ❤️ for Indonesian Warteg and UMKM community**
 
-[🌐 Website](https://smarteg.app) • [📧 Contact](mailto:contact@smarteg.app) • [📚 Documentation](openapi.yaml)
+[🌐 Website](https://smarteg.faizath.com) • [📧 Contact](mailto:contact@smarteg.faizath.com) • [📚 Documentation](openapi.yaml)
 
 </div>
